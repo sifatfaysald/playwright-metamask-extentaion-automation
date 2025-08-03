@@ -1,27 +1,42 @@
 {
   "name": "playwright-metamask-extentaion-automation",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "playwright test",
-    "test:headed": "playwright test --headed",
-    "test:debug": "playwright test --debug"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "description": "A handy Playwright project by Sifat Faysal that makes automating MetaMask wallet interactions for Web3 apps easy and reliable.",
+  "author": "Sifat Faysal",
+  "license": "MIT",
   "type": "module",
+  "keywords": [
+    "playwright",
+    "metamask",
+    "automation",
+    "web3",
+    "dapp",
+    "wallet",
+    "testing",
+    "QA",
+    "open-source"
+  ],
+  "scripts": {
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "test:debug": "npx playwright test --debug",
+    "test:grep": "npx playwright test --grep",
+    "report": "npx playwright show-report",
+    "clean": "rm -rf playwright-report storage/*.json storage/user-data-dir",
+    "lint": "tsc --noEmit",
+    "prepare": "npx playwright install"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "devDependencies": {
-    "@playwright/test": "^1.54.2",
-    "@types/dotenv": "^6.1.1",
+    "@playwright/test": "^1.54.1",
     "@types/node": "^24.1.0",
-    "cross-env": "^10.0.0",
-    "playwright": "^1.54.2",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.9.2"
+    "tsx": "^4.7.0",
+    "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@synthetixio/synpress": "^4.1.0",
     "dotenv": "^17.2.1"
   }
 }

@@ -1,83 +1,41 @@
-# --------------------------
-# Node.js Dependencies
-# --------------------------
+# ===========================
+# Node.js dependencies & logs
+# ===========================
 node_modules/
-package-lock.json
-pnpm-lock.yaml
-yarn.lock
-
-# --------------------------
-# Playwright Test Outputs
-# --------------------------
-test-results/
-playwright-report/
-playwright/.cache/
-screenshots/
-extention/
-user-data/
-storage/
-
-# --------------------------
-# Environment & Secrets
-# --------------------------
-.env
-.env.local
-.env.*.local
-
-# --------------------------
-# VSCode Editor Settings
-# --------------------------
-.vscode/
-
-# --------------------------
-# OS-Specific Files
-# --------------------------
-.DS_Store         # macOS Finder metadata
-Thumbs.db         # Windows image cache
-desktop.ini       # Windows desktop config
-
-# --------------------------
-# Build Outputs (if applicable)
-# --------------------------
 dist/
-build/
-out/
-
-# --------------------------
-# TypeScript Files
-# --------------------------
-*.tsbuildinfo
-
-# --------------------------
-# Logs
-# --------------------------
-logs/
-*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# --------------------------
-# Coverage Reports (if using coverage)
-# --------------------------
-coverage/
+# ===========================
+# TypeScript build cache
+# ===========================
+*.tsbuildinfo
 
-# --------------------------
-# Temporary Files
-# --------------------------
-tmp/
-temp/
-*.tmp
-*.swp
-*.swo
+# ===========================
+# Playwright test artifacts
+# ===========================
+test-results/
+playwright-report/
+storage/*.json
+storage/user-data-dir/
+*.zip
 
-# --------------------------
-# IDE Specific (optional, for JetBrains)
-# --------------------------
+# ===========================
+# OS-specific system files
+# ===========================
+.DS_Store
+Thumbs.db
+
+# ===========================
+# IDEs and Editors configs
+# ===========================
+.vscode/
 .idea/
 
-# --------------------------
-# Playwright Trace Viewer Artifacts
-# --------------------------
-trace.zip
-traces/
+# ===========================
+# Optional: environment files
+# ===========================
+# Uncomment if you want to ignore .env files
+# .env
+# .env.local
