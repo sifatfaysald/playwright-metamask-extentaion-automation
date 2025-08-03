@@ -36,6 +36,5 @@ Thumbs.db
 # ===========================
 # Optional: environment files
 # ===========================
-# Uncomment if you want to ignore .env files
-# .env
+.env
 # .env.local
