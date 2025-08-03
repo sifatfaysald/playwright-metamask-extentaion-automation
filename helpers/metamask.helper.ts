@@ -87,7 +87,7 @@ export async function addCustomNetwork(context: BrowserContext) {
     const makeButtonVisible = async (selector: string) => {
         await page.evaluate((sel) => {
             const btn = document.querySelector(sel);
-            if (btn && btn instanceof HTMLElement) {
+            if (btn instanceof HTMLElement) {
                 btn.style.display = 'flex';
             }
         }, selector);

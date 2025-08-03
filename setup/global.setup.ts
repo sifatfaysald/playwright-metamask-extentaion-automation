@@ -1,15 +1,13 @@
 import { BrowserContext, chromium } from '@playwright/test';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { existsSync, mkdirSync } from 'fs';
-import { importMetaMaskWallet, addCustomNetwork } from '../helpers/metamask.helper';
+import { importMetaMaskWallet, addCustomNetwork, unlockMetaMaskIfLocked } from '../helpers/metamask.helper';
 import { appAuthSetup } from '../helpers/auth.helper';
+import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const storageDir = path.resolve(__dirname, '../storage');
-const metamaskStoragePath = path.join(storageDir, 'metamask.json');
+const storagePath = path.join(storageDir, 'auth.json'); // Combined auth + metamask state
 const userDataDir = path.join(storageDir, 'user-data-dir');
 const extensionPath = path.resolve(__dirname, '../extension/metamask');
 
@@ -21,35 +19,37 @@ const ensureDir = (dir: string) => {
 };
 
 async function setupMetaMask(context: BrowserContext) {
-    if (existsSync(metamaskStoragePath)) {
-        console.log('[Setup] MetaMask already configured.');
-        return;
+    if (existsSync(storagePath)) {
+        console.log('[Setup] MetaMask already configured, trying to unlock...');
+        await unlockMetaMaskIfLocked(context);
+    } else {
+        const extensionPage = context.pages().find(p => p.url().includes('chrome-extension'))
+            ?? await context.waitForEvent('page');
+
+        await extensionPage.bringToFront();
+        await extensionPage.waitForLoadState('domcontentloaded');
+        await extensionPage.waitForTimeout(4000);
+
+        console.log('[Setup] Importing MetaMask wallet...');
+        await importMetaMaskWallet(context);
+
+        console.log('[Setup] Adding custom network...');
+        await addCustomNetwork(context);
+
+        await unlockMetaMaskIfLocked(context);
+
+        console.log('[Setup] MetaMask setup complete.');
     }
-
-    const extensionPage = context.pages().find(p => p.url().includes('chrome-extension'))
-        ?? await context.waitForEvent('page');
-
-    await extensionPage.bringToFront();
-    await extensionPage.waitForLoadState('domcontentloaded');
-    await extensionPage.waitForTimeout(4000);
-
-    console.log('[Setup] Importing MetaMask wallet...');
-    await importMetaMaskWallet(context);
-
-    console.log('[Setup] Adding custom network...');
-    await addCustomNetwork(context);
-
-    await context.storageState({ path: metamaskStoragePath });
-    console.log('[Setup] MetaMask setup complete.');
 }
 
 export default async function globalSetup() {
     ensureDir(userDataDir);
+    ensureDir(storageDir);
 
     const args = [
         `--disable-extensions-except=${extensionPath}`,
         `--load-extension=${extensionPath}`,
-        '--remote-debugging-port=9222',
+        '--remote-debugging-port=9222'
     ];
 
     const context = await chromium.launchPersistentContext(userDataDir, {
@@ -58,8 +58,16 @@ export default async function globalSetup() {
     });
 
     try {
+        if (!existsSync(storagePath)) {
+            console.log('[Setup] Running app auth setup...');
+            await appAuthSetup(context);
+            await context.storageState({ path: storagePath });
+        }
+
         await setupMetaMask(context);
-        await appAuthSetup(context);
+
+        await context.storageState({ path: storagePath });
+        console.log(`[Setup] Saved combined auth & MetaMask state to ${storagePath}`);
     } finally {
         await context.close();
     }
