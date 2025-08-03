@@ -14,6 +14,8 @@ playwright-report/
 playwright/.cache/
 screenshots/
 extention/
+user-data/
+storage/
 
 # --------------------------
 # Environment & Secrets
