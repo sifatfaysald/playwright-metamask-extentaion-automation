@@ -1,0 +1,38 @@
+export const MetaMaskLocators = {
+    network: {
+        networkButton: 'button[data-testid="network-display"]',
+        addCustomNetworkBtn: 'button:has-text("Add a custom network")',
+        networkNameInput: 'input[data-testid="network-form-network-name"]',
+        chainIdInput: 'input[data-testid="network-form-chain-id"]',
+        symbolInput: 'input[data-testid="network-form-ticker-input"]',
+        addRpcDropdown: 'button[data-testid="test-add-rpc-drop-down"]',
+        addRpcUrlBtn: 'button:has-text("Add RPC URL")',
+        rpcUrlInput: 'input[data-testid="rpc-url-input-test"]',
+        rpcNameInput: 'input[data-testid="rpc-name-input-test"]',
+        addRpcConfirmBtn: 'button:has-text("Add URL")',
+        addExplorerDropdown: 'button[data-testid="test-explorer-drop-down"]',
+        addExplorerUrlBtn: 'button:has-text("Add a block explorer URL")',
+        explorerUrlInput: 'input[data-testid="explorer-url-input"]',
+        saveButton: 'button:has-text("Save"):not([disabled])',
+        networkOption: '[data-testid="Base Sepolia Testnet"]',
+    },
+    import: {
+        termsCheckbox: '#onboarding__terms-checkbox',
+        importWalletBtn: 'text=Import an existing wallet',
+        agreeBtn: 'text=I agree',
+        seedInput: (index: number) => `input[data-testid="import-srp__srp-word-${index}"]`,
+        confirmImportBtn: '[data-testid="import-srp-confirm"]',
+    },
+    password: {
+        new: '[data-testid="create-password-new"]',
+        confirm: '[data-testid="create-password-confirm"]',
+        termsCheckbox: '[data-testid="create-password-terms"]',
+        importBtn: '[data-testid="create-password-import"]',
+    },
+    complete: {
+        doneBtn: '[data-testid="onboarding-complete-done"]',
+        pinNext: '[data-testid="pin-extension-next"]',
+        pinDone: '[data-testid="pin-extension-done"]',
+        notNow: '[data-testid="not-now-button"]',
+    },
+};
