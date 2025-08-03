@@ -12,6 +12,7 @@ yarn.lock
 test-results/
 playwright-report/
 playwright/.cache/
+screenshots/
 
 # --------------------------
 # Environment & Secrets
