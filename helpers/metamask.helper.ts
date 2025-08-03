@@ -6,12 +6,24 @@ dotenv.config();
 
 export async function getMetaMaskPage(context: BrowserContext): Promise<Page> {
     let page = context.pages().find(p => p.url().includes('chrome-extension'));
-    if (!page) {
-        page = await context.waitForEvent('page', { timeout: 60000 });
+    if (page) {
+        await page.bringToFront();
+        await page.waitForLoadState('domcontentloaded');
+        return page;
     }
-    await page.bringToFront();
-    await page.waitForLoadState('domcontentloaded');
-    return page;
+
+    try {
+        page = await context.waitForEvent('page', { timeout: 15000 });
+        if (page.url().includes('chrome-extension')) {
+            await page.bringToFront();
+            await page.waitForLoadState('domcontentloaded');
+            return page;
+        } else {
+            throw new Error('New page is not MetaMask extension');
+        }
+    } catch {
+        throw new Error('MetaMask extension page not found');
+    }
 }
 
 export async function importMetaMaskWallet(context: BrowserContext) {

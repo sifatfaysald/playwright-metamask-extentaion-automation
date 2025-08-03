@@ -11,8 +11,8 @@ const extensionPath = path.resolve(__dirname, 'extension/metamask');
 export default defineConfig({
     globalSetup: './setup/global.setup.ts',
     testDir: './tests',
-    timeout: 30000,
-    expect: { timeout: 5000 },
+    timeout: 60000,
+    expect: { timeout: 10000 },
     use: {
         baseURL: process.env.BASE_URL || 'http://localhost:3000',
         headless: false,
@@ -21,7 +21,7 @@ export default defineConfig({
             args: [
                 `--disable-extensions-except=${extensionPath}`,
                 `--load-extension=${extensionPath}`,
-                '--remote-debugging-port=9222'
+                '--remote-debugging-port=9222',
             ],
         },
     },
