@@ -1,0 +1,79 @@
+# --------------------------
+# Node.js Dependencies
+# --------------------------
+node_modules/
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# --------------------------
+# Playwright Test Outputs
+# --------------------------
+test-results/
+playwright-report/
+playwright/.cache/
+
+# --------------------------
+# Environment & Secrets
+# --------------------------
+.env
+.env.local
+.env.*.local
+
+# --------------------------
+# VSCode Editor Settings
+# --------------------------
+.vscode/
+
+# --------------------------
+# OS-Specific Files
+# --------------------------
+.DS_Store         # macOS Finder metadata
+Thumbs.db         # Windows image cache
+desktop.ini       # Windows desktop config
+
+# --------------------------
+# Build Outputs (if applicable)
+# --------------------------
+dist/
+build/
+out/
+
+# --------------------------
+# TypeScript Files
+# --------------------------
+*.tsbuildinfo
+
+# --------------------------
+# Logs
+# --------------------------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --------------------------
+# Coverage Reports (if using coverage)
+# --------------------------
+coverage/
+
+# --------------------------
+# Temporary Files
+# --------------------------
+tmp/
+temp/
+*.tmp
+*.swp
+*.swo
+
+# --------------------------
+# IDE Specific (optional, for JetBrains)
+# --------------------------
+.idea/
+
+# --------------------------
+# Playwright Trace Viewer Artifacts
+# --------------------------
+trace.zip
+traces/
