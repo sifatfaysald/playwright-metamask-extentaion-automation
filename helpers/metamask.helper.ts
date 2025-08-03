@@ -4,9 +4,6 @@ import { MetaMaskLocators as L } from '../utils/metamask.locators';
 
 dotenv.config();
 
-/**
- * Get the MetaMask Extension Page (reuse if already opened)
- */
 export async function getMetaMaskPage(context: BrowserContext): Promise<Page> {
     let page = context.pages().find(p => p.url().includes('chrome-extension'));
     if (!page) {
@@ -17,9 +14,6 @@ export async function getMetaMaskPage(context: BrowserContext): Promise<Page> {
     return page;
 }
 
-/**
- * Import Wallet in MetaMask (First Time Setup)
- */
 export async function importMetaMaskWallet(context: BrowserContext) {
     const seedPhrase = process.env.SEED_PHRASE;
     const password = process.env.WALLET_PASSWORD;
@@ -60,12 +54,8 @@ export async function importMetaMaskWallet(context: BrowserContext) {
     } catch {}
 }
 
-/**
- * Unlock MetaMask If Locked
- */
 export async function unlockMetaMaskIfLocked(context: BrowserContext) {
     const page = await getMetaMaskPage(context);
-
     const unlockInput = await page.$('input[data-testid="unlock-password"]');
     if (unlockInput) {
         console.log('[MetaMask] Unlocking...');
@@ -77,9 +67,6 @@ export async function unlockMetaMaskIfLocked(context: BrowserContext) {
     }
 }
 
-/**
- * Add Custom Network to MetaMask
- */
 export async function addCustomNetwork(context: BrowserContext) {
     const page = await getMetaMaskPage(context);
     await page.waitForTimeout(3000);
@@ -87,7 +74,7 @@ export async function addCustomNetwork(context: BrowserContext) {
     const makeButtonVisible = async (selector: string) => {
         await page.evaluate((sel) => {
             const btn = document.querySelector(sel);
-            if (btn instanceof HTMLElement) {
+            if (btn && btn instanceof HTMLElement) {
                 btn.style.display = 'flex';
             }
         }, selector);

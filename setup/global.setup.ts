@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const storageDir = path.resolve(__dirname, '../storage');
-const storagePath = path.join(storageDir, 'auth.json'); // Combined auth + metamask state
+const storagePath = path.join(storageDir, 'auth.json');
 const userDataDir = path.join(storageDir, 'user-data-dir');
 const extensionPath = path.resolve(__dirname, '../extension/metamask');
 
@@ -18,17 +18,29 @@ const ensureDir = (dir: string) => {
     }
 };
 
+async function getMetaMaskPage(context: BrowserContext) {
+    await new Promise(r => setTimeout(r, 3000));
+
+    let page = context.pages().find(p => p.url().includes('chrome-extension'));
+
+    if (!page) {
+        page = await context.waitForEvent('page', { timeout: 20000 });
+        if (!page.url().includes('chrome-extension')) {
+            throw new Error('MetaMask extension page not found');
+        }
+    }
+
+    await page.bringToFront();
+    await page.waitForLoadState('domcontentloaded');
+    return page;
+}
+
 async function setupMetaMask(context: BrowserContext) {
     if (existsSync(storagePath)) {
         console.log('[Setup] MetaMask already configured, trying to unlock...');
         await unlockMetaMaskIfLocked(context);
     } else {
-        const extensionPage = context.pages().find(p => p.url().includes('chrome-extension'))
-            ?? await context.waitForEvent('page');
-
-        await extensionPage.bringToFront();
-        await extensionPage.waitForLoadState('domcontentloaded');
-        await extensionPage.waitForTimeout(4000);
+        const extensionPage = await getMetaMaskPage(context);
 
         console.log('[Setup] Importing MetaMask wallet...');
         await importMetaMaskWallet(context);
@@ -65,7 +77,6 @@ export default async function globalSetup() {
         }
 
         await setupMetaMask(context);
-
         await context.storageState({ path: storagePath });
         console.log(`[Setup] Saved combined auth & MetaMask state to ${storagePath}`);
     } finally {

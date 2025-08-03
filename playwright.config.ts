@@ -1,43 +1,36 @@
 import { defineConfig, devices } from '@playwright/test';
-import * as dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import * as dotenv from 'dotenv';
 dotenv.config();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const extensionPath = path.resolve(__dirname, 'extension/metamask');
-const useMetaMask = process.env.USE_METAMASK === 'true';
 
 export default defineConfig({
     globalSetup: './setup/global.setup.ts',
     testDir: './tests',
-    testMatch: ['**/*.spec.ts'],
     timeout: 30000,
     expect: { timeout: 5000 },
     use: {
         baseURL: process.env.BASE_URL || 'http://localhost:3000',
-        storageState: './storage/auth.json',
         headless: false,
-        trace: 'on-first-retry',
-        screenshot: 'only-on-failure',
-        video: 'retain-on-failure',
+        storageState: './storage/auth.json',
+        launchOptions: {
+            args: [
+                `--disable-extensions-except=${extensionPath}`,
+                `--load-extension=${extensionPath}`,
+                '--remote-debugging-port=9222'
+            ],
+        },
     },
     projects: [
         {
             name: 'chromium',
             use: {
                 ...devices['Desktop Chrome'],
-                launchOptions: {
-                    args: useMetaMask ? [
-                        `--disable-extensions-except=${extensionPath}`,
-                        `--load-extension=${extensionPath}`,
-                    ] : [],
-                },
             },
         },
     ],
-    outputDir: 'test-results/',
 });
