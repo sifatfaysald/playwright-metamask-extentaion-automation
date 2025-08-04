@@ -1,73 +1,53 @@
-import { BrowserContext, chromium } from '@playwright/test';
 import path from 'path';
-import { existsSync, mkdirSync } from 'fs';
-import { importMetaMaskWallet, addCustomNetwork, unlockMetaMaskIfLocked } from '../helpers/metamask.helper';
-import { appAuthSetup } from '../helpers/auth.helper';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { chromium } from '@playwright/test';
+import dotenv from 'dotenv';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const storageDir = path.resolve(__dirname, '../storage');
-const storagePath = path.join(storageDir, 'auth.json'); // combined auth + metamask state
-const userDataDir = path.join(storageDir, 'user-data-dir');
-const extensionPath = path.resolve(__dirname, '../extension/metamask');
+import { setupMetaMask, addCustomNetwork } from '../helpers/metamask.helper';
+import { performAuthLogin } from '../helpers/auth.helper';
 
-const ensureDir = (dir: string) => {
-    if (!existsSync(dir)) {
-        mkdirSync(dir, { recursive: true });
-        console.log(`[Setup] Created directory: ${dir}`);
-    }
-};
+dotenv.config();
 
-async function setupMetaMask(context: BrowserContext) {
-    if (existsSync(storagePath)) {
-        console.log('[Setup] MetaMask already configured, trying to unlock...');
-        await unlockMetaMaskIfLocked(context);
-    } else {
-        const extensionPage = context.pages().find(p => p.url().includes('chrome-extension'))
-            ?? await context.waitForEvent('page');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-        await extensionPage.bringToFront();
-        await extensionPage.waitForLoadState('domcontentloaded');
-        await extensionPage.waitForTimeout(4000);
-
-        console.log('[Setup] Importing MetaMask wallet...');
-        await importMetaMaskWallet(context);
-
-        console.log('[Setup] Adding custom network...');
-        await addCustomNetwork(context);
-
-        await unlockMetaMaskIfLocked(context);
-
-        console.log('[Setup] MetaMask setup complete.');
-    }
-}
+const pathToExtension = path.resolve(__dirname, '../extension/metamask');
+const userDataDir = path.resolve(__dirname, '../storage/user-data-dir');
+const authStoragePath = path.resolve(__dirname, '../storage/auth.json');
+const setupFlagFile = path.join(userDataDir, 'metamask-setup-done');
 
 export default async function globalSetup() {
-    ensureDir(userDataDir);
-    ensureDir(storageDir);
-
-    const args = [
-        `--disable-extensions-except=${extensionPath}`,
-        `--load-extension=${extensionPath}`,
-        '--remote-debugging-port=9222'
-    ];
-
     const context = await chromium.launchPersistentContext(userDataDir, {
         headless: false,
-        args,
+        args: [
+            `--disable-extensions-except=${pathToExtension}`,
+            `--load-extension=${pathToExtension}`,
+        ],
     });
 
     try {
-        if (!existsSync(storagePath)) {
-            console.log('[Setup] Running app auth setup...');
-            await appAuthSetup(context);
-            await context.storageState({ path: storagePath });
+        // MetaMask Setup and Network Add
+        if (!fs.existsSync(setupFlagFile)) {
+            await setupMetaMask(context);
+            await addCustomNetwork(context);
+            fs.writeFileSync(setupFlagFile, 'done');
+            console.log('MetaMask setup & network added successfully!');
+        } else {
+            console.log('MetaMask already setup, skipping setup');
         }
 
-        await setupMetaMask(context);
-
-        await context.storageState({ path: storagePath });
-        console.log(`[Setup] Saved combined auth & MetaMask state to ${storagePath}`);
+        // Auth Login & Storage Save
+        if (!fs.existsSync(authStoragePath)) {
+            await performAuthLogin(context);
+            await context.storageState({ path: authStoragePath });
+            console.log(`Auth storage saved at: ${authStoragePath}`);
+        } else {
+            console.log('Auth storage already exists, skipping auth login');
+        }
+    } catch (error) {
+        console.error('Global setup failed:', error);
+        throw error;
     } finally {
         await context.close();
     }

@@ -16,6 +16,7 @@ yarn-error.log*
 # Playwright test artifacts
 # ===========================
 test-results/
+screenshot/
 playwright-report/
 storage/*.json
 storage/user-data-dir/

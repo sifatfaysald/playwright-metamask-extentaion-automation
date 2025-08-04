@@ -1,29 +1,21 @@
 import { defineConfig, devices } from '@playwright/test';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
 import * as dotenv from 'dotenv';
-dotenv.config();
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const extensionPath = path.resolve(__dirname, 'extension/metamask');
+dotenv.config();
 
 export default defineConfig({
     globalSetup: './setup/global.setup.ts',
     testDir: './tests',
-    timeout: 60000,
-    expect: { timeout: 10000 },
+    testMatch: ['**/*.spec.ts'],
+    timeout: 30000,
+    expect: { timeout: 5000 },
     use: {
         baseURL: process.env.BASE_URL || 'http://localhost:3000',
+        // storageState: './storage/auth.json',
         headless: false,
-        storageState: './storage/auth.json',
-        launchOptions: {
-            args: [
-                `--disable-extensions-except=${extensionPath}`,
-                `--load-extension=${extensionPath}`,
-                '--remote-debugging-port=9222',
-            ],
-        },
+        trace: 'on-first-retry',
+        screenshot: 'only-on-failure',
+        video: 'retain-on-failure',
     },
     projects: [
         {
@@ -33,4 +25,5 @@ export default defineConfig({
             },
         },
     ],
+    outputDir: 'test-results/',
 });
